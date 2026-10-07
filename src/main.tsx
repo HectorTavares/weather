@@ -2,12 +2,15 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import { LanguageProvider } from '@/i18n'
+import { UnitsProvider } from '@/units'
 // import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <LanguageProvider>
-      <App />
+      <UnitsProvider>
+        <App />
+      </UnitsProvider>
     </LanguageProvider>
   </React.StrictMode>
 )

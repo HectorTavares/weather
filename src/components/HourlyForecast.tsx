@@ -1,6 +1,7 @@
 import { CSSProperties, useMemo, useState } from 'react'
 import { HourWeatherData } from '@/types'
 import { useTranslation } from '@/i18n'
+import { useUnits } from '@/units'
 
 type HourlyMetric = 'temperature' | 'wind' | 'rain'
 
@@ -13,6 +14,7 @@ const metrics: HourlyMetric[] = ['temperature', 'rain', 'wind']
 
 export function HourlyForecast({ day, hourlyWeatherData }: HourlyForecastProps) {
   const { forecastDate, hourTime, t, weatherStatus } = useTranslation()
+  const { formatTemperature, formatWindSpeed, toTemperature, toWindSpeed } = useUnits()
   const [metric, setMetric] = useState<HourlyMetric>('temperature')
   const hourlyData = useMemo(
     () => hourlyWeatherData.filter((hour) => hour.time.slice(0, 10) === day.slice(0, 10)),
@@ -21,26 +23,26 @@ export function HourlyForecast({ day, hourlyWeatherData }: HourlyForecastProps) 
 
   const getMetricValue = (hour: HourWeatherData): number => {
     if (metric === 'wind') {
-      return hour.windSpeed
+      return toWindSpeed(hour.windSpeed)
     }
 
     if (metric === 'rain') {
       return hour.precipitationProbability
     }
 
-    return hour.temperature
+    return toTemperature(hour.temperature)
   }
 
   const formatMetricValue = (hour: HourWeatherData): string => {
     if (metric === 'wind') {
-      return `${hour.windSpeed} m/s`
+      return formatWindSpeed(hour.windSpeed)
     }
 
     if (metric === 'rain') {
       return `${hour.precipitationProbability}%`
     }
 
-    return `${hour.temperature}°`
+    return formatTemperature(hour.temperature)
   }
 
   const values = hourlyData.map(getMetricValue)
