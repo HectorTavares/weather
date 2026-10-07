@@ -81,9 +81,9 @@ export function SettingsPanel({
 
         <fieldset className='settings-fieldset'>
           <legend>{t('language')}</legend>
-          <div className='provider-options'>
+          <div className='provider-options language-options'>
             {languageOptions.map((option) => (
-              <label className='provider-option' key={option.value}>
+              <label className='language-option' key={option.value}>
                 <input
                   type='radio'
                   name='language'
@@ -91,7 +91,12 @@ export function SettingsPanel({
                   checked={selectedLanguage === option.value}
                   onChange={(event) => setSelectedLanguage(event.target.value as Language)}
                 />
-                <span>{option.label}</span>
+                <span className='language-option-content'>
+                  <span className='language-option-flag' aria-hidden='true'>
+                    {option.flag}
+                  </span>
+                  <span>{option.label}</span>
+                </span>
               </label>
             ))}
           </div>

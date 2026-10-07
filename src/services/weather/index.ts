@@ -3,7 +3,7 @@ import { openMeteoWeatherProvider } from './openMeteoWeatherProvider'
 import { tomorrowWeatherProvider } from './tomorrowWeatherProvider'
 import { WeatherProvider, WeatherProviderError } from './types'
 
-const DEFAULT_PROVIDER_PRIORITY = ['tomorrow', 'open-meteo']
+const DEFAULT_PROVIDER_PRIORITY = ['open-meteo', 'tomorrow']
 const PROVIDER_TIMEOUT_IN_MS = 3500
 const WEATHER_PROVIDER_PRIORITY_STORAGE_KEY = 'weather-provider-priority'
 
