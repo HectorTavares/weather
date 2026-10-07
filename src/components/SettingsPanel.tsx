@@ -44,7 +44,7 @@ export function SettingsPanel({
             aria-label={t('closeSettings')}
             onClick={onClose}
           >
-            X
+            ×
           </button>
         </div>
 
