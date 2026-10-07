@@ -1,6 +1,14 @@
 :root {
   --primary-color: #a9cee1;
 }
+
+@mixin weather-background($webp-image, $fallback-image) {
+  background-image: image-set(
+    url($webp-image) type('image/webp'),
+    url($fallback-image) type('image/jpeg')
+  );
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -16,10 +24,10 @@
 .main {
   transition: background-image 0.5s ease-in-out;
   &.clear {
-    background-image: url('/clear.jpeg');
+    @include weather-background('/clear.webp', '/clear.jpeg');
   }
   &.clear-cloudy {
-    background-image: url('/clear-cloudy.jpg');
+    @include weather-background('/clear-cloudy.webp', '/clear-cloudy.jpg');
 
     filter: contrast(120%);
     background-position: bottom;
@@ -30,11 +38,11 @@
     }
   }
   &.clouds {
-    background-image: url('/clouds.jpeg');
+    @include weather-background('/clouds.webp', '/clouds.jpeg');
     background-position: inherit;
   }
   &.snow {
-    background-image: url('/snow.jpg');
+    @include weather-background('/snow.webp', '/snow.jpg');
     filter: contrast(120%);
     > .main-infos-container {
       backdrop-filter: blur(1.5px);
@@ -42,23 +50,23 @@
     }
   }
   &.heavy-snow {
-    background-image: url('/heavy-snow.jpg');
+    @include weather-background('/heavy-snow.webp', '/heavy-snow.jpg');
   }
   &.ice {
-    background-image: url('/ice.jpg');
+    @include weather-background('/ice.webp', '/ice.jpg');
     background-position: bottom;
   }
   &.thunderstorm {
-    background-image: url('/thunderstorm.jpg');
+    @include weather-background('/thunderstorm.webp', '/thunderstorm.jpg');
     > .main-infos-container .main-infos > .weather-status-container {
       width: 120px;
     }
   }
   &.rain {
-    background-image: url('/rain.jpg');
+    @include weather-background('/rain.webp', '/rain.jpg');
   }
   &.fog {
-    background-image: url('/fog.jpg');
+    @include weather-background('/fog.webp', '/fog.jpg');
     background-position: left;
   }
 }
@@ -69,7 +77,7 @@
   width: 100vw;
   align-items: center;
   justify-content: space-between;
-  background-image: url('/clear.jpeg');
+  @include weather-background('/clear.webp', '/clear.jpeg');
   background-size: cover;
   background-position: center;
 
