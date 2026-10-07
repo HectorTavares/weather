@@ -513,6 +513,7 @@
 
   &.rain .hourly-chart-bar {
     background: #6aa5e8;
+    min-height: 0;
   }
 }
 
@@ -590,11 +591,10 @@
 
 .settings-panel {
   width: min(420px, 100%);
-  max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 28px;
+  gap: 14px;
+  padding: 20px;
   color: #fff;
   background: rgba(30, 42, 50, 0.88);
   border: solid rgba(255, 255, 255, 0.18) 1px;
@@ -602,7 +602,6 @@
   border-radius: 0;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  overflow-y: auto;
 }
 
 .settings-panel-header {
@@ -646,23 +645,24 @@
 .settings-fieldset {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   border: none;
 
   legend {
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     color: rgba(255, 255, 255, 0.7);
   }
 }
 
 .provider-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .settings-option-label {
-  margin-top: 8px;
+  grid-column: 1 / -1;
+  margin-top: 2px;
   color: rgba(255, 255, 255, 0.66);
   font-size: 0.9rem;
 }
@@ -670,8 +670,9 @@
 .provider-option {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 10px;
   border: solid rgba(255, 255, 255, 0.16) 1px;
   cursor: pointer;
 
@@ -682,13 +683,88 @@
   }
 }
 
+.language-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.language-option {
+  position: relative;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  input:checked + .language-option-content {
+    border-color: var(--primary-color);
+    background: rgba(169, 206, 225, 0.14);
+    box-shadow: inset 0 3px 0 var(--primary-color);
+  }
+
+  input:focus-visible + .language-option-content {
+    outline: solid 2px var(--primary-color);
+    outline-offset: 2px;
+  }
+}
+
+.language-option-content {
+  display: flex;
+  min-height: 72px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 4px;
+  border: solid rgba(255, 255, 255, 0.16) 1px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.language-option-flag {
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
 .settings-save-button {
   height: 44px;
+  min-height: 44px;
+  flex: none;
   border: none;
   color: #000;
   background: var(--primary-color);
   font-weight: bold;
   cursor: pointer;
+}
+
+@media screen and (max-width: 420px) {
+  .settings-panel-backdrop {
+    padding: 12px;
+  }
+
+  .settings-panel {
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .settings-panel-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .settings-close-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .settings-fieldset {
+    gap: 8px;
+  }
+
+  .language-option-content {
+    min-height: 64px;
+  }
 }
 
 @media screen and (max-width: 1010px) {

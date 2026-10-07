@@ -49,6 +49,25 @@ export function HourlyForecast({ day, hourlyWeatherData }: HourlyForecastProps) 
   const maxValue = Math.max(...values, 1)
   const minValue = Math.min(...values, 0)
   const valueRange = maxValue - minValue || 1
+  const temperatureMinimum = values.length ? Math.min(...values) : 0
+  const temperatureMaximum = values.length ? Math.max(...values) : 0
+  const temperaturePadding = Math.max(1, (temperatureMaximum - temperatureMinimum) * 0.2)
+  const temperatureRange = temperatureMaximum - temperatureMinimum + temperaturePadding * 2 || 1
+
+  const getChartHeight = (value: number): number => {
+    if (metric === 'rain') {
+      return Math.min(Math.max(value, 0), 100)
+    }
+
+    if (metric === 'temperature') {
+      return (
+        12 +
+        ((value - (temperatureMinimum - temperaturePadding)) / temperatureRange) * 76
+      )
+    }
+
+    return 18 + ((value - minValue) / valueRange) * 62
+  }
 
   return (
     <section className='hourly-forecast' aria-label={t('hourlyForecast')}>
@@ -79,7 +98,7 @@ export function HourlyForecast({ day, hourlyWeatherData }: HourlyForecastProps) 
           <div className={`hourly-chart ${metric}`}>
             {hourlyData.map((hour) => {
               const value = getMetricValue(hour)
-              const chartHeight = 18 + ((value - minValue) / valueRange) * 62
+              const chartHeight = getChartHeight(value)
 
               return (
                 <article className='hourly-chart-item' key={hour.time}>

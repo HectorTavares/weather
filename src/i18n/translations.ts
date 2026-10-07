@@ -113,10 +113,10 @@ const translations = {
 
 export type TranslationKey = keyof typeof translations.en
 
-export const languageOptions: Array<{ value: Language; label: string }> = [
-  { value: 'en', label: 'English' },
-  { value: 'pt', label: 'Português' },
-  { value: 'es', label: 'Español' },
+export const languageOptions: Array<{ value: Language; label: string; flag: string }> = [
+  { value: 'en', label: 'English', flag: '🇺🇸' },
+  { value: 'pt', label: 'Português', flag: '🇧🇷' },
+  { value: 'es', label: 'Español', flag: '🇪🇸' },
 ]
 
 const weatherStatusTranslations: Record<Language, Record<string, string>> = {
