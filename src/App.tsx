@@ -1,15 +1,6 @@
 import './style.scss'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  CurrentWeatherSummary,
-  ErrorMessage,
-  ForecastList,
-  LoadingOverlay,
-  MainHeader,
-  SearchCityForm,
-  SettingsPanel,
-  WeatherDetails,
-} from '@/components'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import { useWheaterApi, useCities } from '@/hooks'
 import { CurrentWeatherData, DayWeatherData } from '@/types'
 import { capitalizeWords } from '@/utils'
@@ -51,11 +42,8 @@ export default function App() {
       setErrorMessage('')
       updateCity(city)
     } catch (error: unknown) {
-      const weatherApiError = error as WeatherApiError
-
-      console.error(error)
       const message =
-        weatherApiError.response?.data?.code === 400001
+        axios.isAxiosError(error) && error.response?.data?.code === 400001
           ? ERROR_MESSAGES.INVALID_LOCATION
           : ERROR_MESSAGES.GENERIC_ERROR
       setErrorMessage(message)
