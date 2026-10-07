@@ -8,6 +8,7 @@ export interface LanguageContextValue {
   weatherStatus: (status: string) => string
   currentDate: (dateString: string) => string
   forecastDate: (dateString: string) => string
+  hourTime: (dateString: string) => string
 }
 
 export const LanguageContext = createContext<LanguageContextValue | null>(null)

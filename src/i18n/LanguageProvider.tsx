@@ -3,6 +3,7 @@ import { LanguageContext } from './LanguageContext'
 import {
   formatCurrentDate,
   formatForecastDate,
+  formatHour,
   Language,
   translate,
   translateWeatherStatus,
@@ -35,6 +36,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       weatherStatus: (status: string) => translateWeatherStatus(language, status),
       currentDate: (dateString: string) => formatCurrentDate(language, dateString),
       forecastDate: (dateString: string) => formatForecastDate(language, dateString),
+      hourTime: formatHour,
     }),
     [language, setLanguage]
   )

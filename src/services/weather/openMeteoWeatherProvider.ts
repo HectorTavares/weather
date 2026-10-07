@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { DayWeatherData, WeatherStatus } from '@/types'
+import { DayWeatherData, HourWeatherData, WeatherStatus } from '@/types'
 import { WeatherProvider, WeatherProviderError, WeatherStatusByCode } from './types'
 
 interface OpenMeteoGeocodingResult {
@@ -27,6 +27,13 @@ interface OpenMeteoForecastResponse {
     weather_code: number[]
     temperature_2m_max: number[]
     temperature_2m_min: number[]
+  }
+  hourly: {
+    time: string[]
+    temperature_2m: number[]
+    precipitation_probability: number[]
+    weather_code: number[]
+    wind_speed_10m: number[]
   }
 }
 
@@ -108,6 +115,16 @@ function getDailyWeatherData(data: OpenMeteoForecastResponse): DayWeatherData[] 
   }))
 }
 
+function getHourlyWeatherData(data: OpenMeteoForecastResponse): HourWeatherData[] {
+  return data.hourly.time.map((time, index) => ({
+    time,
+    temperature: Math.round(data.hourly.temperature_2m[index]),
+    windSpeed: data.hourly.wind_speed_10m[index],
+    precipitationProbability: data.hourly.precipitation_probability[index],
+    weatherStatus: getOpenMeteoWeatherStatus(data.hourly.weather_code[index]),
+  }))
+}
+
 export const openMeteoWeatherProvider: WeatherProvider = {
   name: OPEN_METEO_PROVIDER_NAME,
   async fetchWeatherData(city, signal) {
@@ -123,6 +140,8 @@ export const openMeteoWeatherProvider: WeatherProvider = {
             current:
               'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,cloud_cover,wind_speed_10m',
             daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+            hourly:
+              'temperature_2m,precipitation_probability,weather_code,wind_speed_10m',
             forecast_days: 7,
             timezone: 'America/Sao_Paulo',
             wind_speed_unit: 'ms',
@@ -145,6 +164,7 @@ export const openMeteoWeatherProvider: WeatherProvider = {
           location: getLocationName(location),
         },
         nextDaysWeatherData: getDailyWeatherData(data),
+        hourlyWeatherData: getHourlyWeatherData(data),
       }
     } catch (error) {
       if (error instanceof WeatherProviderError) {
