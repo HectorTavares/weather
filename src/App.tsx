@@ -1,4 +1,5 @@
 import './style.scss'
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useWheaterApi, useCities } from '@/hooks'
 import { CurrentWeatherData, DayWeatherData } from '@/types'
@@ -33,10 +34,9 @@ export default function App() {
       setNextDaysWeatherData(weatherData.nextDaysWeatherData)
       setErrorMessage('')
       updateCity(city)
-    } catch (error: any) {
-      setErrorMessage(error.response.data.message)
+    } catch (error: unknown) {
       const message =
-        error.response.data.code === 400001
+        axios.isAxiosError(error) && error.response?.data?.code === 400001
           ? ERROR_MESSAGES.INVALID_LOCATION
           : ERROR_MESSAGES.GENERIC_ERROR
       setErrorMessage(message)

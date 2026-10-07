@@ -11,11 +11,13 @@ import {
 import { DEFAULT_CITY, BASE_API_URL, API_KEY } from '@/constants'
 import { CurrentWeatherData, DayWeatherData, WeatherData } from '@/types'
 
+const REQUEST_TIMEOUT_MS = 10_000
+
 export function useWheaterApi() {
   async function fetchCurrentWeatherData(city = DEFAULT_CITY): Promise<CurrentWeatherData> {
     const url = `${BASE_API_URL}realtime?location=${city}&apikey=${API_KEY}`
 
-    const response = await axios.get(url)
+    const response = await axios.get(url, { timeout: REQUEST_TIMEOUT_MS })
     const data = response.data
 
     const weatherData: CurrentWeatherData = {
@@ -35,7 +37,7 @@ export function useWheaterApi() {
   async function fetchNextDaysWeather(city = DEFAULT_CITY): Promise<DayWeatherData[]> {
     const url = `${BASE_API_URL}forecast?location=${city}&timesteps=1d&apikey=${API_KEY}`
 
-    const response = await axios.get(url)
+    const response = await axios.get(url, { timeout: REQUEST_TIMEOUT_MS })
     const data = response.data
 
     const weatherData = data.timelines.daily.map((day: any) => {
