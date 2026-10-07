@@ -34,9 +34,9 @@ export default function App() {
       setErrorMessage('')
       updateCity(city)
     } catch (error: any) {
-      setErrorMessage(error.response.data.message)
+      console.error(error)
       const message =
-        error.response.data.code === 400001
+        error.response?.data?.code === 400001
           ? ERROR_MESSAGES.INVALID_LOCATION
           : ERROR_MESSAGES.GENERIC_ERROR
       setErrorMessage(message)

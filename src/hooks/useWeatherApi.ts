@@ -1,55 +1,13 @@
-import axios from 'axios'
 import {
-  getCityName,
-  dateFormat,
-  getWeatherStatus,
-  getMonthAndDay,
   setMainColorByWeatherClass,
   getClassByWeatherStatus,
 } from '@/utils'
 
-import { DEFAULT_CITY, BASE_API_URL, API_KEY } from '@/constants'
-import { CurrentWeatherData, DayWeatherData, WeatherData } from '@/types'
+import { DEFAULT_CITY } from '@/constants'
+import { WeatherData } from '@/types'
+import { fetchWeatherDataWithFallback } from '@/services/weather'
 
 export function useWheaterApi() {
-  async function fetchCurrentWeatherData(city = DEFAULT_CITY): Promise<CurrentWeatherData> {
-    const url = `${BASE_API_URL}realtime?location=${city}&apikey=${API_KEY}`
-
-    const response = await axios.get(url)
-    const data = response.data
-
-    const weatherData: CurrentWeatherData = {
-      temperature: Math.round(data.data.values.temperature),
-      humidity: data.data.values.humidity,
-      windSpeed: data.data.values.windSpeed,
-      temperatureApparent: Math.round(data.data.values.temperatureApparent),
-      weatherStatus: getWeatherStatus(data.data.values.weatherCode),
-      cloudy: data.data.values.cloudCover,
-      date: dateFormat(data.data.time),
-      location: getCityName(data.location.name),
-    }
-
-    return weatherData
-  }
-
-  async function fetchNextDaysWeather(city = DEFAULT_CITY): Promise<DayWeatherData[]> {
-    const url = `${BASE_API_URL}forecast?location=${city}&timesteps=1d&apikey=${API_KEY}`
-
-    const response = await axios.get(url)
-    const data = response.data
-
-    const weatherData = data.timelines.daily.map((day: any) => {
-      return {
-        day: getMonthAndDay(day.time),
-        weatherStatus: getWeatherStatus(day.values.weatherCodeMin),
-        temperatureMax: Math.round(day.values.temperatureMax),
-        temperatureMin: Math.round(day.values.temperatureMin),
-      }
-    })
-
-    return weatherData
-  }
-
   async function fetchAndCacheWeatherData(city = DEFAULT_CITY): Promise<WeatherData> {
     const cache = await caches.open('weather-cache')
     const cachedResponse = await cache.match(city)
@@ -71,18 +29,7 @@ export function useWheaterApi() {
       }
     }
 
-    const currentWeatherPromise = fetchCurrentWeatherData(city)
-    const nextDaysWheaterPromise = fetchNextDaysWeather(city)
-
-    const [currentWheater, nextDaysWheater] = await Promise.all([
-      currentWeatherPromise,
-      nextDaysWheaterPromise,
-    ])
-
-    const weatherData: WeatherData = {
-      currentWeatherData: currentWheater,
-      nextDaysWeatherData: nextDaysWheater,
-    }
+    const weatherData = await fetchWeatherDataWithFallback(city)
     const weatherClass = getClassByWeatherStatus(
       weatherData.currentWeatherData.weatherStatus.description
     )
@@ -106,39 +53,3 @@ export function useWheaterApi() {
     fetchAndCacheWeatherData,
   }
 }
-
-/*
-{
-  "data": {
-    "time": "2023-07-01T17:54:00Z",
-    "values": {
-      "cloudBase": 0.18,
-      "cloudCeiling": 0.18,
-      "cloudCover": 86,
-      "dewPoint": 15.31,
-      "freezingRainIntensity": 0,
-      "humidity": 92,
-      "precipitationProbability": 8,
-      "pressureSurfaceLevel": 1012.8,
-      "rainIntensity": 0.49,
-      "sleetIntensity": 0,
-      "snowIntensity": 0,
-      "temperature": 16.88,
-      "temperatureApparent": 16.88,
-      "uvHealthConcern": 0,
-      "uvIndex": 0,
-      "visibility": 16,
-      "weatherCode": 4000,
-      "windDirection": 195.69,
-      "windGust": 1.81,
-      "windSpeed": 1.81
-    }
-  },
-  "location": {
-    "lat": -29.85116195678711,
-    "lon": -51.177886962890625,
-    "name": "Esteio, Região Geográfica Imediata de Porto Alegre, Região Metropolitana de Porto Alegre, Região Geográfica Intermediária de Porto Alegre, Rio Grande do Sul, Região Sul, Brasil",
-    "type": "administrative"
-  }
-}
-*/
