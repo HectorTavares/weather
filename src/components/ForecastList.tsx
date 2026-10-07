@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DayWeatherData, HourWeatherData } from '@/types'
 import { useTranslation } from '@/i18n'
 import { DayResumeInfo } from './DayResumeInfo'
@@ -12,32 +12,48 @@ interface ForecastListProps {
 export function ForecastList({ nextDaysWeatherData, hourlyWeatherData }: ForecastListProps) {
   const { t } = useTranslation()
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  const [shouldScrollToForecast, setShouldScrollToForecast] = useState(false)
+  const hourlyForecastRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (
+      nextDaysWeatherData.length &&
+      !nextDaysWeatherData.some((dayWeatherData) => dayWeatherData.day === selectedDay)
+    ) {
+      setSelectedDay(nextDaysWeatherData[0].day)
+    }
+  }, [nextDaysWeatherData, selectedDay])
+
+  useEffect(() => {
+    if (shouldScrollToForecast && selectedDay) {
+      hourlyForecastRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setShouldScrollToForecast(false)
+    }
+  }, [selectedDay, shouldScrollToForecast])
+
+  const handleDaySelection = (day: string) => {
+    setSelectedDay(day)
+    setShouldScrollToForecast(true)
+  }
 
   return (
     <section className='next-days-info'>
-      <h2>{t('nextDays')}</h2>
+      {selectedDay ? (
+        <div className='hourly-forecast-container' ref={hourlyForecastRef}>
+          <HourlyForecast day={selectedDay} hourlyWeatherData={hourlyWeatherData} />
+        </div>
+      ) : null}
+
+      <h2 className='next-days-title'>{t('nextDays')}</h2>
 
       {nextDaysWeatherData.map((dayWeatherData) => (
         <DayResumeInfo
           key={dayWeatherData.day}
           dayWeatherData={dayWeatherData}
           isSelected={selectedDay === dayWeatherData.day}
-          onSelect={() =>
-            setSelectedDay((currentDay) =>
-              currentDay === dayWeatherData.day ? null : dayWeatherData.day
-            )
-          }
+          onSelect={() => handleDaySelection(dayWeatherData.day)}
         />
       ))}
-      {selectedDay ? (
-        <HourlyForecast
-          day={selectedDay}
-          hourlyWeatherData={hourlyWeatherData}
-          onClose={() => setSelectedDay(null)}
-        />
-      ) : (
-        <p className='hourly-forecast-hint'>{t('selectDay')}</p>
-      )}
     </section>
   )
 }
