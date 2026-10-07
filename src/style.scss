@@ -393,20 +393,15 @@
         }
       }
 
-      .hourly-forecast-hint {
-        margin-top: 18px;
-        color: rgba(255, 255, 255, 0.48);
-        font-size: 0.9rem;
-        line-height: 1.5;
+      .next-days-title {
+        margin-top: 32px;
       }
     }
   }
 }
 
 .hourly-forecast {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: solid 1px rgba(255, 255, 255, 0.22);
+  scroll-margin-top: 20px;
 }
 
 .hourly-forecast-header {
@@ -428,30 +423,6 @@
   font-weight: bold;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.hourly-close-button {
-  width: 36px;
-  height: 36px;
-  border: none;
-  color: #000;
-  background: var(--primary-color);
-  font-size: 1.75rem;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background-color 200ms ease-in-out,
-    transform 200ms ease-in-out;
-
-  &:hover {
-    background: #c2e2f1;
-    transform: translateY(-1px);
-  }
-
-  &:focus-visible {
-    outline: solid 2px #fff;
-    outline-offset: 3px;
-  }
 }
 
 .hourly-metric-tabs {
