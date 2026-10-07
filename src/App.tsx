@@ -1,5 +1,5 @@
 import './style.scss'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useWheaterApi, useCities } from '@/hooks'
 import { CurrentWeatherData, DayWeatherData } from '@/types'
 import { capitalizeWords } from '@/utils'
@@ -16,14 +16,13 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [city, setCity] = useState<string>(getCity())
+  const initialCity = useRef(city)
   const citiesOptions = getCitiesList()
   const currentMainClassByStatus = getClassByWeatherStatus(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    currentWeatherData?.weatherStatus.description!
+    currentWeatherData?.weatherStatus.description ?? ''
   )
-  console.log(errorMessage)
 
-  const fetchData = async (city: string) => {
+  const fetchData = useCallback(async (city: string) => {
     try {
       setIsLoading(true)
       const weatherData = await fetchAndCacheWeatherData(city)
@@ -33,21 +32,20 @@ export default function App() {
       setNextDaysWeatherData(weatherData.nextDaysWeatherData)
       setErrorMessage('')
       updateCity(city)
-    } catch (error: any) {
-      setErrorMessage(error.response.data.message)
+    } catch (error: unknown) {
       const message =
-        error.response.data.code === 400001
+        error instanceof Error && error.message === 'INVALID_LOCATION'
           ? ERROR_MESSAGES.INVALID_LOCATION
           : ERROR_MESSAGES.GENERIC_ERROR
       setErrorMessage(message)
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [fetchAndCacheWeatherData, updateCity])
 
   useEffect(() => {
-    fetchData(city)
-  }, [])
+    fetchData(initialCity.current)
+  }, [fetchData])
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     event.preventDefault()
@@ -56,14 +54,14 @@ export default function App() {
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    updateCitiesList(currentWeatherData!.location, city)
-    // updateCity(city)
+    if (currentWeatherData) {
+      updateCitiesList(currentWeatherData.location, city)
+    }
     fetchData(city)
   }
 
   const handleOnSelectCity = (selectedCity: string): void => {
     updateCitiesList(city, selectedCity)
-    // updateCity(selectedCity)
     setCity(capitalizeWords(selectedCity))
     fetchData(capitalizeWords(selectedCity))
   }
@@ -98,8 +96,6 @@ export default function App() {
       </section>
     )
   }
-
-  console.log(currentWeatherData)
 
   return (
     <main
@@ -162,6 +158,7 @@ export default function App() {
             {citiesOptions.map((searchCity) => {
               return (
                 <button
+                  type='button'
                   className='searchCity-option '
                   key={searchCity}
                   onClick={() => handleOnSelectCity(searchCity)}
