@@ -1,8 +1,12 @@
 import { DayWeatherData } from '@/types'
 
-export const DayResumeInfo = ({ dayWeatherData }: { dayWeatherData: DayWeatherData }) => {
+interface DayResumeInfoProps {
+  dayWeatherData: DayWeatherData
+}
+
+export function DayResumeInfo({ dayWeatherData }: DayResumeInfoProps) {
   return (
-    <div className='day-info' key={dayWeatherData.day}>
+    <div className='day-info'>
       <p>{dayWeatherData.day}</p>
       <p>
         {`
@@ -10,18 +14,18 @@ export const DayResumeInfo = ({ dayWeatherData }: { dayWeatherData: DayWeatherDa
       ${dayWeatherData.temperatureMin}°`}
       </p>
       <figure className='weather-status-container'>
-        {/* {dayWeatherData ? ( */}
         <img
           className='weather-status-icon'
-          src={dayWeatherData?.weatherStatus.icon}
-          alt={`${dayWeatherData?.weatherStatus.description} icon`}
+          src={dayWeatherData.weatherStatus.icon}
+          alt={`${dayWeatherData.weatherStatus.description} icon`}
           width={50}
           height={50}
+          loading='lazy'
+          decoding='async'
         />
-        {/* // ) : null} */}
 
         <figcaption className='weather-status'>
-          {dayWeatherData?.weatherStatus.description}
+          {dayWeatherData.weatherStatus.description}
         </figcaption>
       </figure>
     </div>
