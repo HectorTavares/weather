@@ -4,13 +4,13 @@ import {
   getClassByWeatherStatus,
 } from '@/utils'
 
-import { DEFAULT_CITY } from '@/constants'
+import { DEFAULT_CITY, WEATHER_CACHE_NAME } from '@/constants'
 import { WeatherData } from '@/types'
 import { fetchWeatherDataWithFallback } from '@/services/weather'
 
 export function useWheaterApi() {
   const fetchAndCacheWeatherData = useCallback(async (city = DEFAULT_CITY): Promise<WeatherData> => {
-    const cache = await caches.open('weather-cache')
+    const cache = await caches.open(WEATHER_CACHE_NAME)
     const cachedResponse = await cache.match(city)
 
     if (cachedResponse) {

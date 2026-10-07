@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { dateFormat, getMonthAndDay } from '@/utils'
 import { DayWeatherData, WeatherStatus } from '@/types'
 import { WeatherProvider, WeatherProviderError, WeatherStatusByCode } from './types'
 
@@ -102,7 +101,7 @@ function getLocationName(location: OpenMeteoGeocodingResult): string {
 
 function getDailyWeatherData(data: OpenMeteoForecastResponse): DayWeatherData[] {
   return data.daily.time.map((day, index) => ({
-    day: getMonthAndDay(day),
+    day,
     weatherStatus: getOpenMeteoWeatherStatus(data.daily.weather_code[index]),
     temperatureMax: Math.round(data.daily.temperature_2m_max[index]),
     temperatureMin: Math.round(data.daily.temperature_2m_min[index]),
@@ -142,7 +141,7 @@ export const openMeteoWeatherProvider: WeatherProvider = {
           temperatureApparent: Math.round(data.current.apparent_temperature),
           weatherStatus: getOpenMeteoWeatherStatus(data.current.weather_code),
           cloudy: data.current.cloud_cover,
-          date: dateFormat(data.current.time),
+          date: data.current.time,
           location: getLocationName(location),
         },
         nextDaysWeatherData: getDailyWeatherData(data),

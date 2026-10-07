@@ -15,15 +15,17 @@ import {
   WeatherDetails,
 } from '@/components'
 import { getClassByWeatherStatus } from './utils/getClassByWeatherStatus'
-import { ERROR_MESSAGES } from '@/constants'
+import { WEATHER_CACHE_NAME } from '@/constants'
+import { TranslationKey, useTranslation } from '@/i18n'
 
 export default function App() {
   const { fetchAndCacheWeatherData } = useWheaterApi()
   const { updateCitiesList, updateCity, getCity, getCitiesList } = useCities()
+  const { t } = useTranslation()
 
   const [currentWeatherData, setCurrentWeatherData] = useState<CurrentWeatherData | null>()
   const [nextDaysWeatherData, setNextDaysWeatherData] = useState<DayWeatherData[]>([])
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [errorKey, setErrorKey] = useState<TranslationKey | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false)
   const [city, setCity] = useState<string>(getCity())
@@ -41,14 +43,14 @@ export default function App() {
 
       setCurrentWeatherData(weatherData.currentWeatherData)
       setNextDaysWeatherData(weatherData.nextDaysWeatherData)
-      setErrorMessage('')
+      setErrorKey(null)
       updateCity(city)
     } catch (error: unknown) {
-      const message =
+      const nextErrorKey =
         axios.isAxiosError(error) && error.response?.data?.code === 400001
-          ? ERROR_MESSAGES.INVALID_LOCATION
-          : ERROR_MESSAGES.GENERIC_ERROR
-      setErrorMessage(message)
+          ? 'invalidLocation'
+          : 'genericError'
+      setErrorKey(nextErrorKey)
     } finally {
       setIsLoading(false)
     }
@@ -78,7 +80,7 @@ export default function App() {
   }
 
   const handleProviderPriorityChange = async (): Promise<void> => {
-    const cache = await caches.open('weather-cache')
+    const cache = await caches.open(WEATHER_CACHE_NAME)
     await cache.delete(city)
     fetchData(city)
   }
@@ -99,7 +101,7 @@ export default function App() {
       <div className='main-infos-container'>
         <MainHeader onSettingsClick={() => setIsSettingsOpen(true)} />
         <CurrentWeatherSummary currentWeatherData={currentWeatherData} />
-        <ErrorMessage message={errorMessage} />
+        <ErrorMessage message={errorKey ? t(errorKey) : ''} />
       </div>
 
       <aside className='sidebar'>

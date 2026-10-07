@@ -1,8 +1,12 @@
+import { useTranslation } from '@/i18n'
+
 interface MainHeaderProps {
   onSettingsClick: () => void
 }
 
 export function MainHeader({ onSettingsClick }: MainHeaderProps) {
+  const { t } = useTranslation()
+
   return (
     <div className='design-setting-container'>
       <a className='design' target='_blank' href='https://dribbble.com/thearthurk'>
@@ -12,7 +16,7 @@ export function MainHeader({ onSettingsClick }: MainHeaderProps) {
         <img
           className='settings-icon'
           src='/settings.svg'
-          alt='settings button'
+          alt={t('settingsButton')}
           width={50}
           height={50}
           loading='lazy'

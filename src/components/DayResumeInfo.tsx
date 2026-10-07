@@ -1,13 +1,17 @@
 import { DayWeatherData } from '@/types'
+import { useTranslation } from '@/i18n'
 
 interface DayResumeInfoProps {
   dayWeatherData: DayWeatherData
 }
 
 export function DayResumeInfo({ dayWeatherData }: DayResumeInfoProps) {
+  const { forecastDate, t, weatherStatus } = useTranslation()
+  const translatedWeatherStatus = weatherStatus(dayWeatherData.weatherStatus.description)
+
   return (
     <div className='day-info'>
-      <p>{dayWeatherData.day}</p>
+      <p>{forecastDate(dayWeatherData.day)}</p>
       <p>
         {`
       ${dayWeatherData.temperatureMax}° - 
@@ -17,7 +21,7 @@ export function DayResumeInfo({ dayWeatherData }: DayResumeInfoProps) {
         <img
           className='weather-status-icon'
           src={dayWeatherData.weatherStatus.icon}
-          alt={`${dayWeatherData.weatherStatus.description} icon`}
+          alt={`${translatedWeatherStatus} ${t('weatherIcon')}`}
           width={50}
           height={50}
           loading='lazy'
@@ -25,7 +29,7 @@ export function DayResumeInfo({ dayWeatherData }: DayResumeInfoProps) {
         />
 
         <figcaption className='weather-status'>
-          {dayWeatherData.weatherStatus.description}
+          {translatedWeatherStatus}
         </figcaption>
       </figure>
     </div>
