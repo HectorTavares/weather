@@ -40,9 +40,10 @@ export default function App() {
       setNextDaysWeatherData(weatherData.nextDaysWeatherData)
       setErrorMessage('')
       updateCity(city)
-    } catch (error: unknown) {
+    } catch (error: any) {
+      console.error(error)
       const message =
-        error instanceof Error && error.message === 'INVALID_LOCATION'
+        error.response?.data?.code === 400001
           ? ERROR_MESSAGES.INVALID_LOCATION
           : ERROR_MESSAGES.GENERIC_ERROR
       setErrorMessage(message)
