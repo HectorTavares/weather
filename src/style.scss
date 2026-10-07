@@ -188,11 +188,11 @@
 
       > .location-date-container {
         font-size: 2rem;
-        //TODO:setar aqui pra quebrar o texto
-        word-break: break-word;
+        min-width: 0;
         .location {
           font-size: 5rem;
           line-height: 1;
+          overflow-wrap: break-word;
         }
         .date {
           font-size: 1.2rem;
@@ -353,7 +353,50 @@
       padding: 20px 20px 45px 25px;
       min-width: 100vw;
       > .main-infos {
-        justify-content: center;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        justify-content: stretch;
+        width: 100%;
+
+        .temperature {
+          font-size: 6rem;
+        }
+
+        > .location-date-container {
+          text-align: left;
+
+          .location {
+            font-size: 4rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .main > .main-infos-container .main-infos {
+    gap: 14px;
+
+    .temperature {
+      font-size: 4.75rem;
+    }
+
+    > .location-date-container {
+      .location {
+        font-size: 2.8rem;
+      }
+      .date {
+        font-size: 1rem;
+      }
+    }
+
+    .weather-status-container {
+      width: 60px;
+      font-size: 1rem;
+
+      .weather-status-icon {
+        width: 60px;
       }
     }
   }
@@ -361,6 +404,8 @@
 
 @media screen and (max-width: 530px) {
   .main > .main-infos-container .main-infos {
+    grid-template-columns: auto minmax(0, 1fr);
+
     .temperature {
       font-size: 5rem;
     }
@@ -373,6 +418,7 @@
       }
     }
     .weather-status-container {
+      grid-column: 1 / -1;
       width: 45px;
       .weather-status-icon {
         width: 45px;
