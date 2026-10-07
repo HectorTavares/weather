@@ -360,8 +360,9 @@
         align-items: center;
         justify-content: space-between;
         height: 100px;
-        width: 100%;
-        padding: 0;
+        width: calc(100% - 20px);
+        margin: 0 10px;
+        padding: 0 12px;
         border: none;
         color: inherit;
         text-align: left;
@@ -370,16 +371,17 @@
         transition:
           background-color 200ms ease-in-out,
           color 200ms ease-in-out,
-          transform 200ms ease-in-out;
+          box-shadow 200ms ease-in-out;
 
         &:hover,
         &.selected {
           background: rgba(169, 206, 225, 0.17);
           color: #fff;
+          box-shadow: inset 3px 0 0 var(--primary-color);
         }
 
         &:hover {
-          transform: translateX(4px);
+          background: rgba(169, 206, 225, 0.24);
         }
 
         &:focus-visible {
@@ -459,15 +461,47 @@
 
 .hourly-chart {
   display: grid;
-  grid-auto-columns: minmax(72px, 1fr);
+  grid-auto-columns: 76px;
   grid-auto-flow: column;
-  gap: 8px;
+  gap: 10px;
   min-height: 196px;
   margin-top: 18px;
-  padding: 8px 0 4px;
+  margin-inline: -12px;
+  padding: 12px 14px 14px;
+  border-block: solid 1px rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 14px;
+  scrollbar-color: rgba(169, 206, 225, 0.65) rgba(255, 255, 255, 0.1);
   scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent
+  );
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(169, 206, 225, 0.65);
+  }
 
   &.temperature .hourly-chart-bar {
     background: var(--primary-color);
@@ -485,8 +519,9 @@
 .hourly-chart-item {
   display: grid;
   grid-template-rows: 24px 82px 22px 30px;
-  min-width: 72px;
+  min-width: 76px;
   text-align: center;
+  scroll-snap-align: start;
 }
 
 .hourly-chart-value {
@@ -528,6 +563,17 @@
   margin-top: 24px;
   color: rgba(255, 255, 255, 0.56);
   line-height: 1.5;
+}
+
+@media screen and (max-width: 530px) {
+  .hourly-chart {
+    grid-auto-columns: 68px;
+    gap: 8px;
+  }
+
+  .hourly-chart-item {
+    min-width: 68px;
+  }
 }
 
 .settings-panel-backdrop {
