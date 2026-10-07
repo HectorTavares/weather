@@ -5,6 +5,13 @@ import {
   weatherProviderOptions,
 } from '@/services/weather'
 import { languageOptions, Language, useTranslation } from '@/i18n'
+import {
+  TemperatureUnit,
+  temperatureUnitOptions,
+  useUnits,
+  WindUnit,
+  windUnitOptions,
+} from '@/units'
 
 interface SettingsPanelProps {
   isOpen: boolean
@@ -18,8 +25,12 @@ export function SettingsPanel({
   onProviderPriorityChange,
 }: SettingsPanelProps) {
   const { language, setLanguage, t } = useTranslation()
+  const { temperatureUnit, windUnit, setTemperatureUnit, setWindUnit } = useUnits()
   const [selectedProvider, setSelectedProvider] = useState(getWeatherProviderPriority()[0])
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(language)
+  const [selectedTemperatureUnit, setSelectedTemperatureUnit] =
+    useState<TemperatureUnit>(temperatureUnit)
+  const [selectedWindUnit, setSelectedWindUnit] = useState<WindUnit>(windUnit)
 
   if (!isOpen) {
     return null
@@ -29,6 +40,8 @@ export function SettingsPanel({
     event.preventDefault()
     setWeatherProviderPriority(selectedProvider)
     setLanguage(selectedLanguage)
+    setTemperatureUnit(selectedTemperatureUnit)
+    setWindUnit(selectedWindUnit)
     onProviderPriorityChange()
     onClose()
   }
@@ -79,6 +92,42 @@ export function SettingsPanel({
                   onChange={(event) => setSelectedLanguage(event.target.value as Language)}
                 />
                 <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className='settings-fieldset'>
+          <legend>{t('units')}</legend>
+          <div className='provider-options'>
+            <p className='settings-option-label'>{t('temperatureUnit')}</p>
+            {temperatureUnitOptions.map((option) => (
+              <label className='provider-option' key={option.value}>
+                <input
+                  type='radio'
+                  name='temperature-unit'
+                  value={option.value}
+                  checked={selectedTemperatureUnit === option.value}
+                  onChange={(event) =>
+                    setSelectedTemperatureUnit(event.target.value as TemperatureUnit)
+                  }
+                />
+                <span>{t(option.labelKey)}</span>
+              </label>
+            ))}
+          </div>
+          <div className='provider-options'>
+            <p className='settings-option-label'>{t('windUnit')}</p>
+            {windUnitOptions.map((option) => (
+              <label className='provider-option' key={option.value}>
+                <input
+                  type='radio'
+                  name='wind-unit'
+                  value={option.value}
+                  checked={selectedWindUnit === option.value}
+                  onChange={(event) => setSelectedWindUnit(event.target.value as WindUnit)}
+                />
+                <span>{t(option.labelKey)}</span>
               </label>
             ))}
           </div>

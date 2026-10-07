@@ -1,5 +1,6 @@
 import { DayWeatherData } from '@/types'
 import { useTranslation } from '@/i18n'
+import { useUnits } from '@/units'
 
 interface DayResumeInfoProps {
   dayWeatherData: DayWeatherData
@@ -9,6 +10,7 @@ interface DayResumeInfoProps {
 
 export function DayResumeInfo({ dayWeatherData, isSelected, onSelect }: DayResumeInfoProps) {
   const { forecastDate, t, weatherStatus } = useTranslation()
+  const { formatTemperature } = useUnits()
   const translatedWeatherStatus = weatherStatus(dayWeatherData.weatherStatus.description)
 
   return (
@@ -20,9 +22,8 @@ export function DayResumeInfo({ dayWeatherData, isSelected, onSelect }: DayResum
     >
       <span>{forecastDate(dayWeatherData.day)}</span>
       <span>
-        {`
-      ${dayWeatherData.temperatureMax}° - 
-      ${dayWeatherData.temperatureMin}°`}
+        {formatTemperature(dayWeatherData.temperatureMax)} -{' '}
+        {formatTemperature(dayWeatherData.temperatureMin)}
       </span>
       <span className='weather-status-container'>
         <img

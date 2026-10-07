@@ -1,5 +1,6 @@
 import { CurrentWeatherData } from '@/types'
 import { useTranslation } from '@/i18n'
+import { useUnits } from '@/units'
 
 interface WeatherDetailsProps {
   currentWeatherData?: CurrentWeatherData | null
@@ -7,6 +8,7 @@ interface WeatherDetailsProps {
 
 export function WeatherDetails({ currentWeatherData }: WeatherDetailsProps) {
   const { t } = useTranslation()
+  const { formatTemperature, formatWindSpeed } = useUnits()
 
   return (
     <section className='weather-info'>
@@ -22,11 +24,15 @@ export function WeatherDetails({ currentWeatherData }: WeatherDetailsProps) {
       </div>
       <div className='weather-info-line'>
         <p className='title'>{t('wind')}: </p>
-        <p className='value'>{currentWeatherData?.windSpeed} m/s </p>
+        <p className='value'>
+          {currentWeatherData ? formatWindSpeed(currentWeatherData.windSpeed) : null}
+        </p>
       </div>
       <div className='weather-info-line'>
         <p className='title'>{t('windChill')}: </p>
-        <p className='value'>{currentWeatherData?.temperatureApparent}° </p>
+        <p className='value'>
+          {currentWeatherData ? formatTemperature(currentWeatherData.temperatureApparent) : null}
+        </p>
       </div>
     </section>
   )

@@ -590,6 +590,7 @@
 
 .settings-panel {
   width: min(420px, 100%);
+  max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -601,6 +602,7 @@
   border-radius: 0;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  overflow-y: auto;
 }
 
 .settings-panel-header {
@@ -657,6 +659,12 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.settings-option-label {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.9rem;
 }
 
 .provider-option {

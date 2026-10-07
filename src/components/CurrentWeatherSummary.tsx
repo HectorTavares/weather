@@ -1,5 +1,6 @@
 import { CurrentWeatherData } from '@/types'
 import { useTranslation } from '@/i18n'
+import { useUnits } from '@/units'
 
 interface CurrentWeatherSummaryProps {
   currentWeatherData?: CurrentWeatherData | null
@@ -7,6 +8,7 @@ interface CurrentWeatherSummaryProps {
 
 export function CurrentWeatherSummary({ currentWeatherData }: CurrentWeatherSummaryProps) {
   const { currentDate, t, weatherStatus } = useTranslation()
+  const { formatTemperature } = useUnits()
   const translatedWeatherStatus = currentWeatherData
     ? weatherStatus(currentWeatherData.weatherStatus.description)
     : ''
@@ -14,7 +16,9 @@ export function CurrentWeatherSummary({ currentWeatherData }: CurrentWeatherSumm
   return (
     <section className='main-infos'>
       <div className='temperature-container'>
-        <h2 className='temperature'>{currentWeatherData?.temperature}°</h2>
+        <h2 className='temperature'>
+          {currentWeatherData ? formatTemperature(currentWeatherData.temperature) : null}
+        </h2>
       </div>
       <div className='location-date-container'>
         <p className='location'> {currentWeatherData?.location}</p>
