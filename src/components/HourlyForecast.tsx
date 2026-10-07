@@ -7,12 +7,11 @@ type HourlyMetric = 'temperature' | 'wind' | 'rain'
 interface HourlyForecastProps {
   day: string
   hourlyWeatherData: HourWeatherData[]
-  onClose: () => void
 }
 
 const metrics: HourlyMetric[] = ['temperature', 'rain', 'wind']
 
-export function HourlyForecast({ day, hourlyWeatherData, onClose }: HourlyForecastProps) {
+export function HourlyForecast({ day, hourlyWeatherData }: HourlyForecastProps) {
   const { forecastDate, hourTime, t, weatherStatus } = useTranslation()
   const [metric, setMetric] = useState<HourlyMetric>('temperature')
   const hourlyData = useMemo(
@@ -56,14 +55,6 @@ export function HourlyForecast({ day, hourlyWeatherData, onClose }: HourlyForeca
           <p className='hourly-forecast-eyebrow'>{t('hourlyForecast')}</p>
           <h3>{forecastDate(day)}</h3>
         </div>
-        <button
-          type='button'
-          className='hourly-close-button'
-          aria-label={t('closeHourlyForecast')}
-          onClick={onClose}
-        >
-          ×
-        </button>
       </div>
 
       {hourlyData.length ? (
