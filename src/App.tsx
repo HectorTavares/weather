@@ -16,6 +16,14 @@ import { capitalizeWords } from '@/utils'
 import { getClassByWeatherStatus } from './utils/getClassByWeatherStatus'
 import { ERROR_MESSAGES } from '@/constants'
 
+interface WeatherApiError {
+  response?: {
+    data?: {
+      code?: number
+    }
+  }
+}
+
 export default function App() {
   const { fetchAndCacheWeatherData } = useWheaterApi()
   const { updateCitiesList, updateCity, getCity, getCitiesList } = useCities()
@@ -42,10 +50,12 @@ export default function App() {
       setNextDaysWeatherData(weatherData.nextDaysWeatherData)
       setErrorMessage('')
       updateCity(city)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const weatherApiError = error as WeatherApiError
+
       console.error(error)
       const message =
-        error.response?.data?.code === 400001
+        weatherApiError.response?.data?.code === 400001
           ? ERROR_MESSAGES.INVALID_LOCATION
           : ERROR_MESSAGES.GENERIC_ERROR
       setErrorMessage(message)
