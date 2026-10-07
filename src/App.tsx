@@ -2,7 +2,7 @@ import './style.scss'
 import axios from 'axios'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useWheaterApi, useCities } from '@/hooks'
-import { CurrentWeatherData, DayWeatherData } from '@/types'
+import { CurrentWeatherData, DayWeatherData, HourWeatherData } from '@/types'
 import { capitalizeWords } from '@/utils'
 import {
   CurrentWeatherSummary,
@@ -25,6 +25,7 @@ export default function App() {
 
   const [currentWeatherData, setCurrentWeatherData] = useState<CurrentWeatherData | null>()
   const [nextDaysWeatherData, setNextDaysWeatherData] = useState<DayWeatherData[]>([])
+  const [hourlyWeatherData, setHourlyWeatherData] = useState<HourWeatherData[]>([])
   const [errorKey, setErrorKey] = useState<TranslationKey | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false)
@@ -43,6 +44,7 @@ export default function App() {
 
       setCurrentWeatherData(weatherData.currentWeatherData)
       setNextDaysWeatherData(weatherData.nextDaysWeatherData)
+      setHourlyWeatherData(weatherData.hourlyWeatherData)
       setErrorKey(null)
       updateCity(city)
     } catch (error: unknown) {
@@ -113,7 +115,10 @@ export default function App() {
           onSubmit={handleOnSubmit}
         />
         <WeatherDetails currentWeatherData={currentWeatherData} />
-        <ForecastList nextDaysWeatherData={nextDaysWeatherData} />
+        <ForecastList
+          nextDaysWeatherData={nextDaysWeatherData}
+          hourlyWeatherData={hourlyWeatherData}
+        />
       </aside>
     </main>
   )

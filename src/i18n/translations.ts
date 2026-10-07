@@ -18,6 +18,13 @@ const translations = {
     wind: 'Wind',
     windChill: 'Wind Chill',
     nextDays: 'Next Days',
+    hourlyForecast: 'Hourly forecast',
+    selectDay: 'Select a day to view the hourly forecast.',
+    temperature: 'Temperature',
+    rain: 'Rain',
+    precipitationChance: 'Chance of rain',
+    closeHourlyForecast: 'Close hourly forecast',
+    noHourlyForecast: 'Hourly forecast is unavailable for this day.',
     loading: 'Loading',
     settingsButton: 'Settings button',
     weatherIcon: 'weather icon',
@@ -38,6 +45,13 @@ const translations = {
     wind: 'Vento',
     windChill: 'Sensação térmica',
     nextDays: 'Próximos dias',
+    hourlyForecast: 'Previsão por hora',
+    selectDay: 'Selecione um dia para ver a previsão por hora.',
+    temperature: 'Temperatura',
+    rain: 'Chuva',
+    precipitationChance: 'Chance de chuva',
+    closeHourlyForecast: 'Fechar previsão por hora',
+    noHourlyForecast: 'A previsão por hora não está disponível para este dia.',
     loading: 'Carregando',
     settingsButton: 'Botão de configurações',
     weatherIcon: 'ícone do clima',
@@ -58,6 +72,13 @@ const translations = {
     wind: 'Viento',
     windChill: 'Sensación térmica',
     nextDays: 'Próximos días',
+    hourlyForecast: 'Pronóstico por hora',
+    selectDay: 'Selecciona un día para ver el pronóstico por hora.',
+    temperature: 'Temperatura',
+    rain: 'Lluvia',
+    precipitationChance: 'Probabilidad de lluvia',
+    closeHourlyForecast: 'Cerrar pronóstico por hora',
+    noHourlyForecast: 'El pronóstico por hora no está disponible para este día.',
     loading: 'Cargando',
     settingsButton: 'Botón de configuración',
     weatherIcon: 'ícono del clima',
@@ -148,4 +169,8 @@ export function formatCurrentDate(language: Language, dateString: string): strin
 
 export function formatForecastDate(language: Language, dateString: string): string {
   return format(parseISO(dateString), 'MMMM d', { locale: dateLocales[language] })
+}
+
+export function formatHour(dateString: string): string {
+  return format(parseISO(dateString), 'HH:mm')
 }

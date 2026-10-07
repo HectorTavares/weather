@@ -21,7 +21,16 @@ export interface DayWeatherData {
   day: string
 }
 
+export interface HourWeatherData {
+  time: string
+  temperature: number
+  windSpeed: number
+  precipitationProbability: number
+  weatherStatus: WeatherStatus
+}
+
 export interface WeatherData {
   currentWeatherData: CurrentWeatherData
   nextDaysWeatherData: DayWeatherData[]
+  hourlyWeatherData: HourWeatherData[]
 }
