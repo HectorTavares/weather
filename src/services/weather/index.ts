@@ -5,27 +5,54 @@ import { WeatherProvider, WeatherProviderError } from './types'
 
 const DEFAULT_PROVIDER_PRIORITY = ['tomorrow', 'open-meteo']
 const PROVIDER_TIMEOUT_IN_MS = 3500
+const WEATHER_PROVIDER_PRIORITY_STORAGE_KEY = 'weather-provider-priority'
 
 const weatherProvidersByName: Record<string, WeatherProvider> = {
   [tomorrowWeatherProvider.name]: tomorrowWeatherProvider,
   [openMeteoWeatherProvider.name]: openMeteoWeatherProvider,
 }
 
-function getProviderPriority(): string[] {
+export const weatherProviderOptions = [
+  { name: tomorrowWeatherProvider.name, label: 'Tomorrow.io' },
+  { name: openMeteoWeatherProvider.name, label: 'Open-Meteo' },
+]
+
+function parseProviderPriority(priority: string): string[] {
+  return priority
+    .split(',')
+    .map((providerName: string) => providerName.trim())
+    .filter(Boolean)
+}
+
+export function getWeatherProviderPriority(): string[] {
+  const storedPriority = localStorage.getItem(WEATHER_PROVIDER_PRIORITY_STORAGE_KEY)
+
+  if (storedPriority) {
+    return parseProviderPriority(storedPriority)
+  }
+
   const envPriority = import.meta.env.VITE_WEATHER_PROVIDER_PRIORITY
 
   if (!envPriority) {
     return DEFAULT_PROVIDER_PRIORITY
   }
 
-  return envPriority
-    .split(',')
-    .map((providerName: string) => providerName.trim())
-    .filter(Boolean)
+  return parseProviderPriority(envPriority)
+}
+
+export function setWeatherProviderPriority(providerName: string): string[] {
+  const nextPriority = [
+    providerName,
+    ...DEFAULT_PROVIDER_PRIORITY.filter((currentProviderName) => currentProviderName !== providerName),
+  ]
+
+  localStorage.setItem(WEATHER_PROVIDER_PRIORITY_STORAGE_KEY, nextPriority.join(','))
+
+  return nextPriority
 }
 
 function getProvidersByPriority(): WeatherProvider[] {
-  return getProviderPriority()
+  return getWeatherProviderPriority()
     .map((providerName) => weatherProvidersByName[providerName])
     .filter(Boolean)
 }
