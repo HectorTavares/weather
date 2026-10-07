@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import {
   setMainColorByWeatherClass,
   getClassByWeatherStatus,
@@ -8,7 +9,7 @@ import { WeatherData } from '@/types'
 import { fetchWeatherDataWithFallback } from '@/services/weather'
 
 export function useWheaterApi() {
-  async function fetchAndCacheWeatherData(city = DEFAULT_CITY): Promise<WeatherData> {
+  const fetchAndCacheWeatherData = useCallback(async (city = DEFAULT_CITY): Promise<WeatherData> => {
     const cache = await caches.open('weather-cache')
     const cachedResponse = await cache.match(city)
 
@@ -43,10 +44,10 @@ export function useWheaterApi() {
       },
     })
 
-    cache.put(city, cacheResponse)
+    await cache.put(city, cacheResponse)
 
     return weatherData
-  }
+  }, [])
 
   return {
     fetchAndCacheWeatherData,
