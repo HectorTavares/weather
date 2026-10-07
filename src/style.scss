@@ -158,20 +158,19 @@
       > .settings-button {
         color: #000;
         border: none;
-        min-width: 80px;
-        min-height: 80px;
+        width: 48px;
+        height: 48px;
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 25px;
         cursor: pointer;
-        background-color: #00000000;
-        // background-color: var(--primary-color);
+        background-color: var(--primary-color);
+        border-radius: 50%;
         transition: background-color 250ms ease-in-out;
-        display: none;
-        // > .settings-icon {
-        //   width: 20px;
-        // }
+        > .settings-icon {
+          width: 20px;
+        }
       }
     }
 
@@ -339,6 +338,92 @@
       }
     }
   }
+}
+
+.settings-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.settings-panel {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px;
+  color: #fff;
+  background: rgba(30, 30, 30, 0.92);
+  border: solid rgba(255, 255, 255, 0.18) 1px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.settings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+.settings-close-button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  color: #000;
+  background: var(--primary-color);
+  cursor: pointer;
+}
+
+.settings-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: none;
+
+  legend {
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.provider-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.provider-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: solid rgba(255, 255, 255, 0.16) 1px;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+  }
+}
+
+.settings-save-button {
+  height: 44px;
+  border: none;
+  color: #000;
+  background: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 1010px) {

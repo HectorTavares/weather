@@ -11,6 +11,15 @@ import { WeatherProvider, WeatherProviderError } from './types'
 
 const TOMORROW_PROVIDER_NAME = 'tomorrow'
 
+interface TomorrowDailyForecast {
+  time: string
+  values: {
+    weatherCodeMin: number
+    temperatureMax: number
+    temperatureMin: number
+  }
+}
+
 async function fetchCurrentWeatherData(
   city: string,
   signal?: AbortSignal
@@ -47,7 +56,7 @@ async function fetchNextDaysWeather(
   const response = await axios.get(url, { signal })
   const data = response.data
 
-  return data.timelines.daily.map((day: any) => ({
+  return data.timelines.daily.map((day: TomorrowDailyForecast) => ({
     day: getMonthAndDay(day.time),
     weatherStatus: getWeatherStatus(day.values.weatherCodeMin),
     temperatureMax: Math.round(day.values.temperatureMax),

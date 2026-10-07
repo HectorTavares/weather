@@ -7,6 +7,7 @@ import {
   LoadingOverlay,
   MainHeader,
   SearchCityForm,
+  SettingsPanel,
   WeatherDetails,
 } from '@/components'
 import { useWheaterApi, useCities } from '@/hooks'
@@ -14,6 +15,14 @@ import { CurrentWeatherData, DayWeatherData } from '@/types'
 import { capitalizeWords } from '@/utils'
 import { getClassByWeatherStatus } from './utils/getClassByWeatherStatus'
 import { ERROR_MESSAGES } from '@/constants'
+
+interface WeatherApiError {
+  response?: {
+    data?: {
+      code?: number
+    }
+  }
+}
 
 export default function App() {
   const { fetchAndCacheWeatherData } = useWheaterApi()
@@ -23,6 +32,7 @@ export default function App() {
   const [nextDaysWeatherData, setNextDaysWeatherData] = useState<DayWeatherData[]>([])
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false)
   const [city, setCity] = useState<string>(getCity())
   const initialCity = useRef(city)
   const citiesOptions = getCitiesList()
@@ -40,10 +50,12 @@ export default function App() {
       setNextDaysWeatherData(weatherData.nextDaysWeatherData)
       setErrorMessage('')
       updateCity(city)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const weatherApiError = error as WeatherApiError
+
       console.error(error)
       const message =
-        error.response?.data?.code === 400001
+        weatherApiError.response?.data?.code === 400001
           ? ERROR_MESSAGES.INVALID_LOCATION
           : ERROR_MESSAGES.GENERIC_ERROR
       setErrorMessage(message)
@@ -75,6 +87,12 @@ export default function App() {
     fetchData(capitalizeWords(selectedCity))
   }
 
+  const handleProviderPriorityChange = async (): Promise<void> => {
+    const cache = await caches.open('weather-cache')
+    await cache.delete(city)
+    fetchData(city)
+  }
+
   return (
     <main
       className={`main ${
@@ -82,9 +100,14 @@ export default function App() {
       } `}
     >
       {isLoading ? <LoadingOverlay /> : null}
+      <SettingsPanel
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onProviderPriorityChange={handleProviderPriorityChange}
+      />
 
       <div className='main-infos-container'>
-        <MainHeader />
+        <MainHeader onSettingsClick={() => setIsSettingsOpen(true)} />
         <CurrentWeatherSummary currentWeatherData={currentWeatherData} />
         <ErrorMessage message={errorMessage} />
       </div>
