@@ -28,6 +28,9 @@ export function useWheaterApi() {
         await cache.delete(city)
       }
     }
+  } catch {
+    return null
+  }
 
     const weatherData = await fetchWeatherDataWithFallback(city)
     const weatherClass = getClassByWeatherStatus(
@@ -35,19 +38,10 @@ export function useWheaterApi() {
     )
 
     setMainColorByWeatherClass(weatherClass)
-
-    const TEN_MINUTES = 600000
-
-    const cacheResponse = new Response(JSON.stringify(weatherData), {
-      headers: {
-        Expires: new Date(Date.now() + TEN_MINUTES).toUTCString(),
-      },
-    })
-
-    cache.put(city, cacheResponse)
+    setCachedWeatherData(city, weatherData)
 
     return weatherData
-  }
+  }, [fetchForecast, fetchLocation])
 
   return {
     fetchAndCacheWeatherData,
