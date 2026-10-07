@@ -1,6 +1,6 @@
 import axios from 'axios'
+import { useCallback } from 'react'
 import {
-  getCityName,
   dateFormat,
   getWeatherStatus,
   getMonthAndDay,
@@ -8,137 +8,205 @@ import {
   getClassByWeatherStatus,
 } from '@/utils'
 
-import { DEFAULT_CITY, BASE_API_URL, API_KEY } from '@/constants'
+import { DEFAULT_CITY } from '@/constants'
 import { CurrentWeatherData, DayWeatherData, WeatherData } from '@/types'
 
-export function useWheaterApi() {
-  async function fetchCurrentWeatherData(city = DEFAULT_CITY): Promise<CurrentWeatherData> {
-    const url = `${BASE_API_URL}realtime?location=${city}&apikey=${API_KEY}`
+const OPEN_METEO_GEOCODING_URL = '/api/geocoding'
+const OPEN_METEO_FORECAST_URL = '/api/forecast'
 
-    const response = await axios.get(url)
-    const data = response.data
+interface GeocodingResult {
+  name: string
+  country?: string
+  admin1?: string
+  latitude: number
+  longitude: number
+  timezone?: string
+}
 
-    const weatherData: CurrentWeatherData = {
-      temperature: Math.round(data.data.values.temperature),
-      humidity: data.data.values.humidity,
-      windSpeed: data.data.values.windSpeed,
-      temperatureApparent: Math.round(data.data.values.temperatureApparent),
-      weatherStatus: getWeatherStatus(data.data.values.weatherCode),
-      cloudy: data.data.values.cloudCover,
-      date: dateFormat(data.data.time),
-      location: getCityName(data.location.name),
-    }
+interface GeocodingResponse {
+  results?: GeocodingResult[]
+}
 
-    return weatherData
+interface OpenMeteoForecastResponse {
+  current: {
+    time: string
+    temperature_2m: number
+    relative_humidity_2m: number
+    apparent_temperature: number
+    weather_code: number
+    cloud_cover: number
+    wind_speed_10m: number
+  }
+  daily: {
+    time: string[]
+    weather_code: number[]
+    temperature_2m_max: number[]
+    temperature_2m_min: number[]
+  }
+}
+
+interface CachedWeatherData {
+  expiresAt: number
+  data: WeatherData
+}
+
+function getOpenMeteoWeatherStatus(weatherCode: number) {
+  const weatherCodeMap: Record<number, number> = {
+    0: 1000,
+    1: 1100,
+    2: 1101,
+    3: 1001,
+    45: 2000,
+    48: 2000,
+    51: 4000,
+    53: 4000,
+    55: 4000,
+    56: 6000,
+    57: 6000,
+    61: 4200,
+    63: 4001,
+    65: 4201,
+    66: 6200,
+    67: 6201,
+    71: 5100,
+    73: 5000,
+    75: 5101,
+    77: 5001,
+    80: 4200,
+    81: 4001,
+    82: 4201,
+    85: 5100,
+    86: 5101,
+    95: 8000,
+    96: 8000,
+    99: 8000,
   }
 
-  async function fetchNextDaysWeather(city = DEFAULT_CITY): Promise<DayWeatherData[]> {
-    const url = `${BASE_API_URL}forecast?location=${city}&timesteps=1d&apikey=${API_KEY}`
+  return getWeatherStatus(weatherCodeMap[weatherCode] ?? 0)
+}
 
-    const response = await axios.get(url)
-    const data = response.data
+function getLocationName(location: GeocodingResult): string {
+  return [location.name, location.admin1, location.country].filter(Boolean).join(', ')
+}
 
-    const weatherData = data.timelines.daily.map((day: any) => {
-      return {
-        day: getMonthAndDay(day.time),
-        weatherStatus: getWeatherStatus(day.values.weatherCodeMin),
-        temperatureMax: Math.round(day.values.temperatureMax),
-        temperatureMin: Math.round(day.values.temperatureMin),
-      }
+function getCachedWeatherData(city: string): WeatherData | null {
+  const cachedData = localStorage.getItem(`weather-cache:${city.toLowerCase()}`)
+
+  if (!cachedData) {
+    return null
+  }
+
+  try {
+    const cache = JSON.parse(cachedData) as CachedWeatherData
+
+    if (cache.expiresAt > Date.now()) {
+      return cache.data
+    }
+  } catch {
+    return null
+  }
+
+  localStorage.removeItem(`weather-cache:${city.toLowerCase()}`)
+  return null
+}
+
+function setCachedWeatherData(city: string, data: WeatherData): void {
+  const TEN_MINUTES = 600000
+
+  localStorage.setItem(
+    `weather-cache:${city.toLowerCase()}`,
+    JSON.stringify({
+      expiresAt: Date.now() + TEN_MINUTES,
+      data,
+    })
+  )
+}
+
+export function useWheaterApi() {
+  const fetchLocation = useCallback(async (city = DEFAULT_CITY): Promise<GeocodingResult> => {
+    const response = await axios.get<GeocodingResponse>(OPEN_METEO_GEOCODING_URL, {
+      params: {
+        name: city,
+        count: 1,
+        language: 'en',
+        format: 'json',
+      },
     })
 
-    return weatherData
-  }
+    const location = response.data.results?.[0]
 
-  async function fetchAndCacheWeatherData(city = DEFAULT_CITY): Promise<WeatherData> {
-    const cache = await caches.open('weather-cache')
-    const cachedResponse = await cache.match(city)
-
-    if (cachedResponse) {
-      const expirationHeader = cachedResponse.headers.get('Expires')
-      const isCachedResponseValid = new Date(expirationHeader!).getTime() > Date.now()
-      if (isCachedResponseValid) {
-        const data = await cachedResponse.json()
-        const weatherClass = getClassByWeatherStatus(
-          data.currentWeatherData.weatherStatus.description
-        )
-
-        setMainColorByWeatherClass(weatherClass)
-
-        return data as WeatherData
-      } else {
-        await cache.delete(city)
-      }
+    if (!location) {
+      throw new Error('INVALID_LOCATION')
     }
 
-    const currentWeatherPromise = fetchCurrentWeatherData(city)
-    const nextDaysWheaterPromise = fetchNextDaysWeather(city)
+    return location
+  }, [])
 
-    const [currentWheater, nextDaysWheater] = await Promise.all([
-      currentWeatherPromise,
-      nextDaysWheaterPromise,
-    ])
+  const fetchForecast = useCallback(async (
+    location: GeocodingResult
+  ): Promise<OpenMeteoForecastResponse> => {
+    const response = await axios.get<OpenMeteoForecastResponse>(OPEN_METEO_FORECAST_URL, {
+      params: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        current:
+          'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover,wind_speed_10m',
+        daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+        timezone: location.timezone ?? 'auto',
+      },
+    })
+
+    return response.data
+  }, [])
+
+  const fetchAndCacheWeatherData = useCallback(async (city = DEFAULT_CITY): Promise<WeatherData> => {
+    const cachedData = getCachedWeatherData(city)
+
+    if (cachedData) {
+      const weatherClass = getClassByWeatherStatus(
+        cachedData.currentWeatherData.weatherStatus.description
+      )
+
+      setMainColorByWeatherClass(weatherClass)
+      return cachedData
+    }
+
+    const location = await fetchLocation(city)
+    const forecast = await fetchForecast(location)
+
+    const currentWeatherData: CurrentWeatherData = {
+      temperature: Math.round(forecast.current.temperature_2m),
+      humidity: forecast.current.relative_humidity_2m,
+      windSpeed: Math.round(forecast.current.wind_speed_10m),
+      temperatureApparent: Math.round(forecast.current.apparent_temperature),
+      weatherStatus: getOpenMeteoWeatherStatus(forecast.current.weather_code),
+      cloudy: forecast.current.cloud_cover,
+      date: dateFormat(forecast.current.time),
+      location: getLocationName(location),
+    }
+
+    const nextDaysWeatherData: DayWeatherData[] = forecast.daily.time.map((day, index) => ({
+      day: getMonthAndDay(day),
+      weatherStatus: getOpenMeteoWeatherStatus(forecast.daily.weather_code[index]),
+      temperatureMax: Math.round(forecast.daily.temperature_2m_max[index]),
+      temperatureMin: Math.round(forecast.daily.temperature_2m_min[index]),
+    }))
 
     const weatherData: WeatherData = {
-      currentWeatherData: currentWheater,
-      nextDaysWeatherData: nextDaysWheater,
+      currentWeatherData,
+      nextDaysWeatherData,
     }
     const weatherClass = getClassByWeatherStatus(
       weatherData.currentWeatherData.weatherStatus.description
     )
 
     setMainColorByWeatherClass(weatherClass)
-
-    const TEN_MINUTES = 600000
-
-    const cacheResponse = new Response(JSON.stringify(weatherData), {
-      headers: {
-        Expires: new Date(Date.now() + TEN_MINUTES).toUTCString(),
-      },
-    })
-
-    cache.put(city, cacheResponse)
+    setCachedWeatherData(city, weatherData)
 
     return weatherData
-  }
+  }, [fetchForecast, fetchLocation])
 
   return {
     fetchAndCacheWeatherData,
   }
 }
-
-/*
-{
-  "data": {
-    "time": "2023-07-01T17:54:00Z",
-    "values": {
-      "cloudBase": 0.18,
-      "cloudCeiling": 0.18,
-      "cloudCover": 86,
-      "dewPoint": 15.31,
-      "freezingRainIntensity": 0,
-      "humidity": 92,
-      "precipitationProbability": 8,
-      "pressureSurfaceLevel": 1012.8,
-      "rainIntensity": 0.49,
-      "sleetIntensity": 0,
-      "snowIntensity": 0,
-      "temperature": 16.88,
-      "temperatureApparent": 16.88,
-      "uvHealthConcern": 0,
-      "uvIndex": 0,
-      "visibility": 16,
-      "weatherCode": 4000,
-      "windDirection": 195.69,
-      "windGust": 1.81,
-      "windSpeed": 1.81
-    }
-  },
-  "location": {
-    "lat": -29.85116195678711,
-    "lon": -51.177886962890625,
-    "name": "Esteio, Região Geográfica Imediata de Porto Alegre, Região Metropolitana de Porto Alegre, Região Geográfica Intermediária de Porto Alegre, Rio Grande do Sul, Região Sul, Brasil",
-    "type": "administrative"
-  }
-}
-*/
