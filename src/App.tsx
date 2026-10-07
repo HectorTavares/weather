@@ -1,19 +1,21 @@
 import './style.scss'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useWheaterApi, useCities } from '@/hooks'
 import { CurrentWeatherData, DayWeatherData } from '@/types'
 import { capitalizeWords } from '@/utils'
+import {
+  CurrentWeatherSummary,
+  ErrorMessage,
+  ForecastList,
+  LoadingOverlay,
+  MainHeader,
+  SearchCityForm,
+  SettingsPanel,
+  WeatherDetails,
+} from '@/components'
 import { getClassByWeatherStatus } from './utils/getClassByWeatherStatus'
 import { ERROR_MESSAGES } from '@/constants'
-
-interface WeatherApiError {
-  response?: {
-    data?: {
-      code?: number
-    }
-  }
-}
 
 export default function App() {
   const { fetchAndCacheWeatherData } = useWheaterApi()
