@@ -1,5 +1,9 @@
 :root {
   --primary-color: #a9cee1;
+  --text-primary: #ffffff;
+  --text-secondary: #dce5eb;
+  --surface-sidebar: rgba(12, 20, 28, 0.76);
+  --divider-color: rgba(255, 255, 255, 0.38);
 }
 
 @mixin weather-background($webp-image, $fallback-image) {
@@ -28,14 +32,7 @@
   }
   &.clear-cloudy {
     @include weather-background('/clear-cloudy.webp', '/clear-cloudy.jpg');
-
-    filter: contrast(120%);
     background-position: bottom;
-    > .main-infos-container {
-      .main-infos {
-        backdrop-filter: blur(1.5px);
-      }
-    }
   }
   &.clouds {
     @include weather-background('/clouds.webp', '/clouds.jpeg');
@@ -43,11 +40,6 @@
   }
   &.snow {
     @include weather-background('/snow.webp', '/snow.jpg');
-    filter: contrast(120%);
-    > .main-infos-container {
-      backdrop-filter: blur(1.5px);
-      text-shadow: black 0.1em 0.1em 0.2em;
-    }
   }
   &.heavy-snow {
     @include weather-background('/heavy-snow.webp', '/heavy-snow.jpg');
@@ -140,6 +132,15 @@
     padding: 50px 50px 85px 60px;
     flex-direction: column;
     position: relative;
+    // Keep white text readable even over the brightest weather photographs.
+    background: linear-gradient(
+      180deg,
+      rgba(12, 20, 28, 0.60) 0%,
+      rgba(12, 20, 28, 0.60) 45%,
+      rgba(12, 20, 28, 0.68) 100%
+    );
+    color: var(--text-primary);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     * {
       font-family: 'Jost', 'Open Sans', Arial, sans-serif;
       font-weight: bold;
@@ -250,13 +251,13 @@
     -webkit-backdrop-filter: blur(18px);
     -moz-backdrop-filter: blur(18px);
     -ms-backdrop-filter: blur(18px);
-    background: rgba(50, 50, 50, 0.5);
+    background: var(--surface-sidebar);
     width: 100%;
     box-shadow: 0 -5px 16px 10px rgba(0, 0, 0, 0.1);
     font-family: 'Lato', 'Open Sans', Arial, sans-serif;
     font-size: 18px;
-    font-weight: 300;
-    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    color: var(--text-primary);
     overflow-y: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -280,12 +281,12 @@
           border-top: 0px;
           border-left: 0px;
           border-right: 0px;
-          border-bottom: solid rgba(255, 255, 255, 0.4) 1px;
-          color: #ffffff66;
+          border-bottom: solid var(--divider-color) 1px;
+          color: var(--text-primary);
           transition: border-bottom-color 250ms ease-in-out;
 
           &::placeholder {
-            color: #ffffff66;
+            color: var(--text-secondary);
           }
           &:focus {
             outline: none;
@@ -322,10 +323,12 @@
           all: unset;
 
           font-size: 18px;
-          color: #ffffff66;
+          color: var(--text-secondary);
+          border-radius: 3px;
           &:hover {
             cursor: pointer;
-            color: rgb(255, 255, 255);
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
           }
         }
       }
@@ -336,8 +339,8 @@
       flex-direction: column;
       margin: $sidebar-margin;
       padding: $sidebar-padding;
-      border-top: solid rgba(255, 255, 255, 0.3) 1px;
-      color: rgba(255, 255, 255, 0.4);
+      border-top: solid var(--divider-color) 1px;
+      color: var(--text-secondary);
       gap: 30px;
       h2 {
         color: white;
@@ -352,7 +355,7 @@
     }
 
     .next-days-info {
-      border-top: solid rgba(255, 255, 255, 0.3) 1px;
+      border-top: solid var(--divider-color) 1px;
       margin: $sidebar-margin;
       padding: $sidebar-padding;
       .day-info {
@@ -420,7 +423,7 @@
 
 .hourly-forecast-eyebrow {
   margin-bottom: 4px;
-  color: var(--primary-color);
+  color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: bold;
   letter-spacing: 0.08em;
@@ -437,7 +440,7 @@
     padding: 10px 6px;
     border: none;
     border-bottom: solid 3px transparent;
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--text-secondary);
     background: transparent;
     cursor: pointer;
     transition:
@@ -550,7 +553,7 @@
 
 .hourly-chart-time {
   padding-top: 6px;
-  color: rgba(255, 255, 255, 0.56);
+  color: var(--text-secondary);
   font-size: 0.75rem;
 }
 
@@ -562,7 +565,7 @@
 
 .hourly-empty {
   margin-top: 24px;
-  color: rgba(255, 255, 255, 0.56);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -650,7 +653,7 @@
 
   legend {
     margin-bottom: 8px;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
   }
 }
 
@@ -663,7 +666,7 @@
 .settings-option-label {
   grid-column: 1 / -1;
   margin-top: 2px;
-  color: rgba(255, 255, 255, 0.66);
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
@@ -718,7 +721,7 @@
   gap: 5px;
   padding: 8px 4px;
   border: solid rgba(255, 255, 255, 0.16) 1px;
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--text-secondary);
   font-size: 0.8rem;
   text-align: center;
 }
@@ -765,6 +768,18 @@
   .language-option-content {
     min-height: 64px;
   }
+}
+
+// White focus rings stay visible across every theme accent color.
+.main button:focus-visible,
+.main a:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 4px;
+}
+
+.main .sidebar .form .form-top > .form-input:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 4px;
 }
 
 @media screen and (max-width: 1010px) {
