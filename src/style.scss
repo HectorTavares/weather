@@ -2,7 +2,7 @@
   --primary-color: #a9cee1;
   --text-primary: #ffffff;
   --text-secondary: #dce5eb;
-  --surface-sidebar: rgba(12, 20, 28, 0.76);
+  --surface-sidebar: rgba(50, 50, 50, 0.5);
   --divider-color: rgba(255, 255, 255, 0.38);
 }
 
@@ -132,15 +132,15 @@
     padding: 50px 50px 85px 60px;
     flex-direction: column;
     position: relative;
-    // Keep white text readable even over the brightest weather photographs.
+    // Preserve the photograph, with a light scrim only near the weather summary.
     background: linear-gradient(
       180deg,
-      rgba(12, 20, 28, 0.60) 0%,
-      rgba(12, 20, 28, 0.60) 45%,
-      rgba(12, 20, 28, 0.68) 100%
+      transparent 55%,
+      rgba(0, 0, 0, 0.12) 80%,
+      rgba(0, 0, 0, 0.24) 100%
     );
     color: var(--text-primary);
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 2px 12px rgba(0, 0, 0, 0.35);
     * {
       font-family: 'Jost', 'Open Sans', Arial, sans-serif;
       font-weight: bold;
@@ -258,6 +258,7 @@
     font-size: 18px;
     font-weight: 400;
     color: var(--text-primary);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     overflow-y: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none;
